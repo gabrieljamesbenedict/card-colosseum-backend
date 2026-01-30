@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.RequiredArgsConstructor;
 
 @Entity
+@Table(name = "Cards")
 @RequiredArgsConstructor
 public class Card {
 
