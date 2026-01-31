@@ -1,10 +1,32 @@
 services:
-  mysql:
+  card-colosseum-mysql:
+    container_name: card-colosseum-mysql
     image: 'mysql:latest'
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 5s
+      retries: 10
+      timeout: 3s
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      - 'MYSQL_DATABASE=card-colosseum-db'
+      - 'MYSQL_USER=testusername'
+      - 'MYSQL_PASSWORD=testpassword'
+      - 'MYSQL_ROOT_PASSWORD=root'
     ports:
       - '3307:3306'
+    volumes:
+      - card-colosseum-data:/etc/data
+
+  card-colosseum:
+    container_name: card-colosseum-server
+    build: .
+    image: 'gabrieljamesbenedict/card-colosseum:latest'
+    depends_on:
+      card-colosseum-mysql:
+        condition: service_healthy
+    ports:
+      - '8080:8080'
+
+volumes:
+  card-colosseum-data:
